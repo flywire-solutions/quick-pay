@@ -90,9 +90,16 @@ export default {
             that.$store.dispatch('paymentSetErrors', errs)
           },
           onCompleteCallback: (args) => {
+            // eslint-disable-next-line no-console
+            console.log(args);
             that.$store.dispatch('complete', args);
             that.$router.push('complete');
-          }
+          },
+          onCancel: () => {
+              // eslint-disable-next-line no-console
+              console.info("Payment window cancelled");
+          },
+          payables: this.payment.payables
         }
 
         popup = window.FlywirePayment.initiate(config);
@@ -106,6 +113,10 @@ export default {
     .quick-pay {
         width: 400px;
         margin: 50px auto;
+
+        .card-body {
+            padding-bottom: 0;
+        }
     }
     h4, h3 {
         small {
@@ -135,5 +146,7 @@ export default {
             display: block;
         }
     }
+
+    
 </style>
 

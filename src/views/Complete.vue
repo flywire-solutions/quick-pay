@@ -21,10 +21,12 @@
                 <ul class="list-group list-group-flush">
                     <li v-if="displayParameters.length > 0" class="list-group-item">
                         <dl>
-                            <template v-for="p in displayParameters">
-                                <dt :key="p.key + '_dt'">{{ p.label }}</dt>
-                                <dd :key="p.key + '_dl'">{{ p.value }}</dd>
-                            </template>
+                        <template v-for="p in displayParameters">
+                            <dt :key="p.key + '_dt'">{{ p.label }}</dt>
+                            <dd :key="p.key + '_dl'">{{ p.value }}</dd>
+                        </template>
+                            <dt>Payment Refrerence</dt>
+                            <dd>{{ result.reference }}</dd>
                         </dl>
                     </li>
                 </ul>
@@ -64,11 +66,14 @@ export default {
 </script>
 
 <style lang="scss">
-  .complete {
+    .complete {
         width: 400px;
         margin: 50px auto;
-    }
 
+        .card-body {
+            padding-bottom: 0;
+        }
+    }
     .error, .cancel, .failure {
       background-color: #D3556B;
     }

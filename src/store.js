@@ -29,6 +29,7 @@ const initialState = {
     address: null,
     city: null,
     country: null,
+    payables: [],
     parameters: {},
   },
   result: {
@@ -120,6 +121,16 @@ const mutations = {
     state.payment.city = payload.city;
     state.payment.country = payload.country;
     state.payment.parameters = payload.parameters;
+    if (payload.payoutCode) {
+      state.payment.payables = [
+        {
+          description:'Split Payment Payout',
+          recipient:payload.payoutCode,
+          amount:payload.payoutAmount
+       },
+      ]
+    }
+    
   },
   PORTAL_INIT(state, payload) {
     state.portal.env = payload.env;
@@ -136,7 +147,7 @@ const mutations = {
 const actions = {
   load: ({ commit }) => {
     commit("UI_START_LOADING");
-    let { amount, firstName, lastName, email, phone, address, city, country, env = "demo", code, title, subTitle, ...params } = utils.getQueryStringValues();
+    let { amount, firstName, lastName, email, phone, address, city, country, env = "demo", code, title, subTitle, payoutCode, payoutAmount, ...params } = utils.getQueryStringValues();
 
     function addConfigErrorIf(fn, message) {
       if (fn()) {
@@ -145,17 +156,14 @@ const actions = {
     }
 
     addConfigErrorIf(() => !code, "Code not supplied");
-    addConfigErrorIf(
-      () => code && code.length !== 3,
-      `Invalid code (${code}) - must be 3 letters.`
-    );
+    addConfigErrorIf(() => code && code.length !== 3, `Invalid code (${code}) - must be 3 letters.`);
     addConfigErrorIf(() => !amount, "Payment amount not supplied");
-    addConfigErrorIf(
-      () => amount && (isNaN(amount) || parseFloat(amount) <= 0),
-      `Invalid payment amount (${amount})`
-    );
+    addConfigErrorIf(() => amount && (isNaN(amount) || parseFloat(amount) <= 0), `Invalid payment amount (${amount})`);
+    addConfigErrorIf(() => payoutCode && payoutCode.length !== 3, `Invalid payout code (${payoutCode}) - must be 3 letters.`);
+    addConfigErrorIf(() => payoutCode && !payoutAmount, `Must supply a payoutAmount when supplying a payoutCode.`);
+    addConfigErrorIf(() => payoutAmount && (isNaN(payoutAmount) || parseFloat(payoutAmount) <= 0), `Invalid payout amount (${payoutAmount})`);
 
-    commit("PAYMENT_INIT", { amount: parseFloat(amount), firstName, lastName, email, phone, address, city, country, parameters: params });
+    commit("PAYMENT_INIT", { amount: parseFloat(amount), firstName, lastName, email, phone, address, city, country, payoutCode, payoutAmount: parseFloat(payoutAmount), parameters: params });
     commit("UI_INIT", { title, subTitle });
 
     const recipientPromise = dataService.getRecipient(code, env);
