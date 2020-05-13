@@ -147,7 +147,7 @@ const mutations = {
 const actions = {
   load: ({ commit }) => {
     commit("UI_START_LOADING");
-    let { amount, firstName, lastName, email, phone, address, city, country, env = "demo", code, title, subTitle, payoutCode, payoutAmount, ...params } = utils.getQueryStringValues();
+    let { amount, firstName, lastName, email, phone, address, city, country, env = "prod", code, title, subTitle, payoutCode, payoutAmount, ...params } = utils.getQueryStringValues();
 
     function addConfigErrorIf(fn, message) {
       if (fn()) {
