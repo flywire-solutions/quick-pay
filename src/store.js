@@ -29,6 +29,8 @@ const initialState = {
     address: null,
     city: null,
     country: null,
+    callbackUrl: null,
+    callbackId: null,
     payables: [],
     parameters: {},
   },
@@ -120,6 +122,8 @@ const mutations = {
     state.payment.address = payload.address;
     state.payment.city = payload.city;
     state.payment.country = payload.country;
+    state.payment.callbackUrl = payload.callbackUrl;
+    state.payment.callbackId = payload.callbackId;
     state.payment.parameters = payload.parameters;
     if (payload.payoutCode) {
       state.payment.payables = [
@@ -147,7 +151,7 @@ const mutations = {
 const actions = {
   load: ({ commit }) => {
     commit("UI_START_LOADING");
-    let { amount, firstName, lastName, email, phone, address, city, country, env = "demo", code, title, subTitle, payoutCode, payoutAmount, ...params } = utils.getQueryStringValues();
+    let { amount, firstName, lastName, email, phone, address, city, country, env = "demo", code, callbackUrl, callbackId, title, subTitle, payoutCode, payoutAmount, ...params } = utils.getQueryStringValues();
 
     function addConfigErrorIf(fn, message) {
       if (fn()) {
@@ -159,11 +163,12 @@ const actions = {
     addConfigErrorIf(() => code && code.length !== 3, `Invalid code (${code}) - must be 3 letters.`);
     addConfigErrorIf(() => !amount, "Payment amount not supplied");
     addConfigErrorIf(() => amount && (isNaN(amount) || parseFloat(amount) <= 0), `Invalid payment amount (${amount})`);
+    addConfigErrorIf(() => callbackUrl && !callbackId, `Must supply a callbackId when supplying a callbackUrl.`);
     addConfigErrorIf(() => payoutCode && payoutCode.length !== 3, `Invalid payout code (${payoutCode}) - must be 3 letters.`);
     addConfigErrorIf(() => payoutCode && !payoutAmount, `Must supply a payoutAmount when supplying a payoutCode.`);
     addConfigErrorIf(() => payoutAmount && (isNaN(payoutAmount) || parseFloat(payoutAmount) <= 0), `Invalid payout amount (${payoutAmount})`);
 
-    commit("PAYMENT_INIT", { amount: parseFloat(amount), firstName, lastName, email, phone, address, city, country, payoutCode, payoutAmount: parseFloat(payoutAmount), parameters: params });
+    commit("PAYMENT_INIT", { amount: parseFloat(amount), firstName, lastName, email, phone, address, city, country, callbackUrl, callbackId, payoutCode, payoutAmount: parseFloat(payoutAmount), parameters: params });
     commit("UI_INIT", { title, subTitle });
 
     const recipientPromise = dataService.getRecipient(code, env);

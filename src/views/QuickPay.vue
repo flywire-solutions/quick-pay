@@ -86,6 +86,9 @@ export default {
           city: this.payment.city,
           country: this.payment.country,
 
+          callbackUrl: this.payment.callbackUrl,
+          callbackId: this.payment.callbackId,
+
           onInvalidInput: (errs) => {
             that.$store.dispatch('paymentSetErrors', errs)
           },
